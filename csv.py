@@ -87,11 +87,11 @@ register_dialect("unix", UnixDialect)
 
 class DictReader:
     def __init__(self, f, fieldnames=None, restkey=None, restval=None,
-                 dialect="excel", *args, **kwds):
+                 dialect="excel", *args, **kwargs):
         self._fieldnames = fieldnames  # list of keys for the dict
         self.restkey = restkey  # key to catch long rows
         self.restval = restval  # default value for short rows
-        self.reader = reader(f, dialect, *args, **kwds)
+        self.reader = reader(f, dialect, *args, **kwargs)
         self.dialect = dialect
         self.line_num = 0
 
