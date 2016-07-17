@@ -55,13 +55,13 @@ if 'posix' in _names:
 
     try:
         from posix import _exit
+
         __all__.append('_exit')
 
         from posix import _have_functions
     except ImportError:
         pass
     import posixpath as path
-
     import posix
 
     __all__.extend(_get_module_attributes_list(posix))
@@ -74,6 +74,7 @@ elif 'nt' in _names:
 
     try:
         from nt import _exit
+
         __all__.append('_exit')
 
         from nt import _have_functions
@@ -92,6 +93,7 @@ elif 'ce' in _names:
 
     try:
         from ce import _exit
+
         __all__.append('_exit')
 
         from ce import _have_functions
@@ -114,6 +116,7 @@ del _names
 
 if _is_globals_has("_have_functions"):
     _globals = globals()
+
 
     def _add(str, fn):
         if (fn in _globals) and (str in _have_functions):
@@ -402,8 +405,8 @@ def walk(top, topdown=True, onerror=None, followlinks=False):
                 nondirs.append(entry.name)
 
             if not topdown and is_dir:
-                # Bottom-up: recurse into sub-directory, but exclude symlinks to
-                # directories if followlinks is False
+                # Bottom-up: recurse into sub-directory, but exclude symlinks
+                # to directories if followlinks is False
                 if followlinks:
                     walk_into = True
                 else:
@@ -937,12 +940,14 @@ fsencode, fsdecode = _fscodec()
 del _fscodec
 
 # Supply spawn*() (probably only for Unix)
-if _is_globals_has("fork") and not _is_globals_has("spawnv") and _is_globals_has("execv"):
+if _is_globals_has("fork") and not _is_globals_has(
+        "spawnv") and _is_globals_has("execv"):
 
     P_WAIT = 0
     P_NOWAIT = P_NOWAITO = 1
 
     __all__.extend(["P_WAIT", "P_NOWAIT", "P_NOWAITO"])
+
 
     # XXX Should we support P_DETACH?  I suppose it could fork()**2
     # and close the std I/O streams.  Also, P_OVERLAY is the same
