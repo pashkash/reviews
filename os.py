@@ -367,7 +367,7 @@ def walk(top, topdown=True, onerror=None, followlinks=False):
     # left to visit.  That logic is copied here.
     try:
         if name == 'nt' and isinstance(top, bytes):
-            scandir_it = _dummy_scandir(top)
+            scandir_it = _DummyScanDir(top)
         else:
             # Note that scandir is global in this module due
             # to earlier import-*.
@@ -485,7 +485,7 @@ class _DummyDirEntry:
         return st.S_ISLNK(stat.st_mode)
 
 
-class _dummy_scandir:
+class _DummyScanDir:
     # listdir-based implementation for bytes patches on Windows
     def __init__(self, dir):
         self.dir = dir
