@@ -1,16 +1,14 @@
-
 """
 csv.py - read/write/investigate CSV files
 """
 
 import re
 from _csv import Error, __version__, writer, reader, register_dialect, \
-                 unregister_dialect, get_dialect, list_dialects, \
-                 field_size_limit, \
-                 QUOTE_MINIMAL, QUOTE_ALL, QUOTE_NONNUMERIC, QUOTE_NONE, \
-                 __doc__
+    unregister_dialect, get_dialect, list_dialects, \
+    field_size_limit, \
+    QUOTE_MINIMAL, QUOTE_ALL, QUOTE_NONNUMERIC, QUOTE_NONE, \
+    __doc__
 from _csv import Dialect as _Dialect
-
 from io import StringIO
 
 __all__ = ["QUOTE_MINIMAL", "QUOTE_ALL", "QUOTE_NONNUMERIC", "QUOTE_NONE",
@@ -19,6 +17,7 @@ __all__ = ["QUOTE_MINIMAL", "QUOTE_ALL", "QUOTE_NONNUMERIC", "QUOTE_NONE",
            "register_dialect", "get_dialect", "list_dialects", "Sniffer",
            "unregister_dialect", "__version__", "DictReader", "DictWriter",
            "unix_dialect"]
+
 
 class Dialect:
     """Describe a CSV dialect.
@@ -51,6 +50,7 @@ class Dialect:
             # We do this for compatibility with py2.3
             raise Error(str(e))
 
+
 class excel(Dialect):
     """Describe the usual properties of Excel-generated CSV files."""
     delimiter = ','
@@ -59,12 +59,18 @@ class excel(Dialect):
     skipinitialspace = False
     lineterminator = '\r\n'
     quoting = QUOTE_MINIMAL
+
+
 register_dialect("excel", excel)
+
 
 class excel_tab(excel):
     """Describe the usual properties of Excel-generated TAB-delimited files."""
     delimiter = '\t'
+
+
 register_dialect("excel-tab", excel_tab)
+
 
 class unix_dialect(Dialect):
     """Describe the usual properties of Unix-generated CSV files."""
@@ -74,15 +80,17 @@ class unix_dialect(Dialect):
     skipinitialspace = False
     lineterminator = '\n'
     quoting = QUOTE_ALL
+
+
 register_dialect("unix", unix_dialect)
 
 
 class DictReader:
     def __init__(self, f, fieldnames=None, restkey=None, restval=None,
                  dialect="excel", *args, **kwds):
-        self._fieldnames = fieldnames   # list of keys for the dict
-        self.restkey = restkey          # key to catch long rows
-        self.restval = restval          # default value for short rows
+        self._fieldnames = fieldnames  # list of keys for the dict
+        self.restkey = restkey  # key to catch long rows
+        self.restval = restval  # default value for short rows
         self.reader = reader(f, dialect, *args, **kwds)
         self.dialect = dialect
         self.line_num = 0
@@ -130,8 +138,8 @@ class DictReader:
 class DictWriter:
     def __init__(self, f, fieldnames, restval="", extrasaction="raise",
                  dialect="excel", *args, **kwds):
-        self.fieldnames = fieldnames    # list of keys for the dict
-        self.restval = restval          # for writing short dicts
+        self.fieldnames = fieldnames  # list of keys for the dict
+        self.restval = restval  # for writing short dicts
         if extrasaction.lower() not in ("raise", "ignore"):
             raise ValueError("extrasaction (%s) must be 'raise' or 'ignore'"
                              % extrasaction)
@@ -156,21 +164,23 @@ class DictWriter:
     def writerows(self, rowdicts):
         return self.writer.writerows(map(self._dict_to_list, rowdicts))
 
+
 # Guard Sniffer's type checking against builds that exclude complex()
 try:
     complex
 except NameError:
     complex = float
 
+
 class Sniffer:
     '''
     "Sniffs" the format of a CSV file (i.e. delimiter, quotechar)
     Returns a Dialect object.
     '''
+
     def __init__(self):
         # in case there is more than one possible delimiter
         self.preferred = [',', '\t', ';', ' ', ':']
-
 
     def sniff(self, sample, delimiters=None):
         """
@@ -178,7 +188,7 @@ class Sniffer:
         """
 
         quotechar, doublequote, delimiter, skipinitialspace = \
-                   self._guess_quote_and_delimiter(sample, delimiters)
+            self._guess_quote_and_delimiter(sample, delimiters)
         if not delimiter:
             delimiter, skipinitialspace = self._guess_delimiter(sample,
                                                                 delimiters)
@@ -200,7 +210,6 @@ class Sniffer:
 
         return dialect
 
-
     def _guess_quote_and_delimiter(self, data, delimiters):
         """
         Looks for text enclosed between two identical quotes
@@ -214,10 +223,14 @@ class Sniffer:
         """
 
         matches = []
-        for restr in ('(?P<delim>[^\w\n"\'])(?P<space> ?)(?P<quote>["\']).*?(?P=quote)(?P=delim)', # ,".*?",
-                      '(?:^|\n)(?P<quote>["\']).*?(?P=quote)(?P<delim>[^\w\n"\'])(?P<space> ?)',   #  ".*?",
-                      '(?P<delim>>[^\w\n"\'])(?P<space> ?)(?P<quote>["\']).*?(?P=quote)(?:$|\n)',  # ,".*?"
-                      '(?:^|\n)(?P<quote>["\']).*?(?P=quote)(?:$|\n)'):                            #  ".*?" (no delim, no space)
+        for restr in (
+                '(?P<delim>[^\w\n"\'])(?P<space> ?)(?P<quote>["\']).*?(?P=quote)(?P=delim)',
+                # ,".*?",
+                '(?:^|\n)(?P<quote>["\']).*?(?P=quote)(?P<delim>[^\w\n"\'])(?P<space> ?)',
+                # ".*?",
+                '(?P<delim>>[^\w\n"\'])(?P<space> ?)(?P<quote>["\']).*?(?P=quote)(?:$|\n)',
+                # ,".*?"
+                '(?:^|\n)(?P<quote>["\']).*?(?P=quote)(?:$|\n)'):  # ".*?" (no delim, no space)
             regexp = re.compile(restr, re.DOTALL | re.MULTILINE)
             matches = regexp.findall(data)
             if matches:
@@ -254,7 +267,7 @@ class Sniffer:
         if delims:
             delim = max(delims, key=delims.get)
             skipinitialspace = delims[delim] == spaces
-            if delim == '\n': # most likely a file with a single column
+            if delim == '\n':  # most likely a file with a single column
                 delim = ''
         else:
             # there is *no* delimiter, it's a single column of quoted data
@@ -264,10 +277,8 @@ class Sniffer:
         # if we see an extra quote between delimiters, we've got a
         # double quoted format
         dq_regexp = re.compile(
-                               r"((%(delim)s)|^)\W*%(quote)s[^%(delim)s\n]*%(quote)s[^%(delim)s\n]*%(quote)s\W*((%(delim)s)|$)" % \
-                               {'delim':re.escape(delim), 'quote':quotechar}, re.MULTILINE)
-
-
+            r"((%(delim)s)|^)\W*%(quote)s[^%(delim)s\n]*%(quote)s[^%(delim)s\n]*%(quote)s\W*((%(delim)s)|$)" % \
+            {'delim': re.escape(delim), 'quote': quotechar}, re.MULTILINE)
 
         if dq_regexp.search(data):
             doublequote = True
@@ -275,7 +286,6 @@ class Sniffer:
             doublequote = False
 
         return (quotechar, doublequote, delim, skipinitialspace)
-
 
     def _guess_delimiter(self, data, delimiters):
         """
@@ -298,7 +308,7 @@ class Sniffer:
 
         data = list(filter(None, data.split('\n')))
 
-        ascii = [chr(c) for c in range(127)] # 7-bit ASCII
+        ascii = [chr(c) for c in range(127)]  # 7-bit ASCII
 
         # build frequency tables
         chunkLength = min(10, len(data))
@@ -343,8 +353,8 @@ class Sniffer:
             while len(delims) == 0 and consistency >= threshold:
                 for k, v in modeList:
                     if v[0] > 0 and v[1] > 0:
-                        if ((v[1]/total) >= consistency and
-                            (delimiters is None or k in delimiters)):
+                        if ((v[1] / total) >= consistency and
+                                (delimiters is None or k in delimiters)):
                             delims[k] = v
                 consistency -= 0.01
 
@@ -371,7 +381,7 @@ class Sniffer:
 
         # nothing else indicates a preference, pick the character that
         # dominates(?)
-        items = [(v,k) for (k,v) in delims.items()]
+        items = [(v, k) for (k, v) in delims.items()]
         items.sort()
         delim = items[-1][1]
 
@@ -379,24 +389,24 @@ class Sniffer:
                             data[0].count("%c " % delim))
         return (delim, skipinitialspace)
 
-
     def has_header(self, sample):
-        # Creates a dictionary of types of data in each column. If any
-        # column is of a single type (say, integers), *except* for the first
-        # row, then the first row is presumed to be labels. If the type
-        # can't be determined, it is assumed to be a string in which case
-        # the length of the string is the determining factor: if all of the
-        # rows except for the first are the same length, it's a header.
-        # Finally, a 'vote' is taken at the end for each column, adding or
-        # subtracting from the likelihood of the first row being a header.
+        """Creates a dictionary of types of data in each column. If any
+        column is of a single type (say, integers), *except* for the first
+        row, then the first row is presumed to be labels. If the type
+        can't be determined, it is assumed to be a string in which case
+        the length of the string is the determining factor: if all of the
+        rows except for the first are the same length, it's a header.
+        Finally, a 'vote' is taken at the end for each column, adding or
+        subtracting from the likelihood of the first row being a header.
+        """
 
         rdr = reader(StringIO(sample), self.sniff(sample))
-
-        header = next(rdr) # assume first row is header
+        header = next(rdr)  # assume first row is header
 
         columns = len(header)
-        columnTypes = {}
-        for i in range(columns): columnTypes[i] = None
+        column_types_dict = {}
+        for i in range(columns):
+            column_types_dict[i] = None
 
         checked = 0
         for row in rdr:
@@ -406,9 +416,9 @@ class Sniffer:
             checked += 1
 
             if len(row) != columns:
-                continue # skip rows that have irregular number of columns
+                continue  # skip rows that have irregular number of columns
 
-            for col in list(columnTypes.keys()):
+            for col in list(column_types_dict.keys()):
 
                 for thisType in [int, float, complex]:
                     try:
@@ -420,29 +430,29 @@ class Sniffer:
                     # fallback to length of string
                     thisType = len(row[col])
 
-                if thisType != columnTypes[col]:
-                    if columnTypes[col] is None: # add new column type
-                        columnTypes[col] = thisType
+                if thisType != column_types_dict[col]:
+                    if column_types_dict[col] is None:  # add new column type
+                        column_types_dict[col] = thisType
                     else:
                         # type is inconsistent, remove column from
                         # consideration
-                        del columnTypes[col]
+                        del column_types_dict[col]
 
         # finally, compare results against first row and "vote"
         # on whether it's a header
-        hasHeader = 0
-        for col, colType in columnTypes.items():
-            if type(colType) == type(0): # it's a length
+        has_header = 0
+        for col, colType in column_types_dict.items():
+            if type(colType) == type(0):  # it's a length
                 if len(header[col]) != colType:
-                    hasHeader += 1
+                    has_header += 1
                 else:
-                    hasHeader -= 1
-            else: # attempt typecast
+                    has_header -= 1
+            else:  # attempt typecast
                 try:
                     colType(header[col])
                 except (ValueError, TypeError):
-                    hasHeader += 1
+                    has_header += 1
                 else:
-                    hasHeader -= 1
+                    has_header -= 1
 
-        return hasHeader > 0
+        return has_header > 0
