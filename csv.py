@@ -199,7 +199,6 @@ class Sniffer:
             _name = "sniffed"
             lineterminator = '\r\n'
             quoting = QUOTE_MINIMAL
-            # escapechar = ''
 
         dialect.doublequote = doublequote
         dialect.delimiter = delimiter
