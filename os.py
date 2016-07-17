@@ -41,7 +41,7 @@ def _is_globals_has(name):
 
 def _get_module_attributes_list(module):
     try:
-        return list(module.__all__)
+        return module.__all__
     except AttributeError:
         return [n for n in dir(module) if n[0] != '_']
 
