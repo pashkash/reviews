@@ -1107,17 +1107,17 @@ def popen(cmd, mode="r", buffering=-1):
                                 shell=True,
                                 stdout=subprocess.PIPE,
                                 bufsize=buffering)
-        return _wrap_close(io.TextIOWrapper(proc.stdout), proc)
+        return _WrapClose(io.TextIOWrapper(proc.stdout), proc)
     else:
         proc = subprocess.Popen(cmd,
                                 shell=True,
                                 stdin=subprocess.PIPE,
                                 bufsize=buffering)
-        return _wrap_close(io.TextIOWrapper(proc.stdin), proc)
+        return _WrapClose(io.TextIOWrapper(proc.stdin), proc)
 
 
 # Helper for popen() -- a proxy for a file whose close waits for the process
-class _wrap_close:
+class _WrapClose:
     def __init__(self, stream, proc):
         self._stream = stream
         self._proc = proc
