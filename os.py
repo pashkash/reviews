@@ -154,7 +154,8 @@ if _is_globals_has("_have_functions"):
     _add("HAVE_FUTIMENS", "utime")
     _add("HAVE_FUTIMES", "utime")
     _add("HAVE_FPATHCONF", "pathconf")
-    if _is_globals_has("statvfs") and _is_globals_has("fstatvfs"):  # mac os x10.3
+    # mac os x10.3
+    if _is_globals_has("statvfs") and _is_globals_has("fstatvfs"):
         _add("HAVE_FSTATVFS", "statvfs")
     supports_fd = _set
 
