@@ -701,10 +701,10 @@ def _execvpe(file, args, env=None):
         except OSError as e:
             last_exc = e
             tb = sys.exc_info()[2]
-            if (e.errno != errno.ENOENT and e.errno != errno.ENOTDIR
-                and saved_exc is None):
-                saved_exc = e
-                saved_tb = tb
+            if saved_exc is None:
+                if e.errno not in [errno.ENOENT, errno.ENOTDIR]:
+                    saved_exc = e
+                    saved_tb = tb
     if saved_exc:
         raise saved_exc.with_traceback(saved_tb)
     raise last_exc.with_traceback(tb)
