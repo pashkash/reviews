@@ -13,11 +13,11 @@ from _csv import (Error, __version__, writer, reader, register_dialect,
 from _csv import Dialect as _Dialect
 
 __all__ = ["QUOTE_MINIMAL", "QUOTE_ALL", "QUOTE_NONNUMERIC", "QUOTE_NONE",
-           "Error", "Dialect", "__doc__", "excel", "excel_tab",
+           "Error", "Dialect", "__doc__", "Excel", "ExcelTab",
            "field_size_limit", "reader", "writer",
            "register_dialect", "get_dialect", "list_dialects", "Sniffer",
            "unregister_dialect", "__version__", "DictReader", "DictWriter",
-           "unix_dialect"]
+           "UnixDialect"]
 
 
 class Dialect:
@@ -26,7 +26,6 @@ class Dialect:
     This must be subclassed (see csv.excel).  Valid attributes are:
     delimiter, quotechar, escapechar, doublequote, skipinitialspace,
     lineterminator, quoting.
-
     """
     _name = ""
     _valid = False
@@ -52,7 +51,7 @@ class Dialect:
             raise Error(str(e))
 
 
-class excel(Dialect):
+class Excel(Dialect):
     """Describe the usual properties of Excel-generated CSV files."""
     delimiter = ','
     quotechar = '"'
@@ -62,18 +61,18 @@ class excel(Dialect):
     quoting = QUOTE_MINIMAL
 
 
-register_dialect("excel", excel)
+register_dialect("excel", Excel)
 
 
-class excel_tab(excel):
+class ExcelTab(Excel):
     """Describe the usual properties of Excel-generated TAB-delimited files."""
     delimiter = '\t'
 
 
-register_dialect("excel-tab", excel_tab)
+register_dialect("excel-tab", ExcelTab)
 
 
-class unix_dialect(Dialect):
+class UnixDialect(Dialect):
     """Describe the usual properties of Unix-generated CSV files."""
     delimiter = ','
     quotechar = '"'
@@ -83,7 +82,7 @@ class unix_dialect(Dialect):
     quoting = QUOTE_ALL
 
 
-register_dialect("unix", unix_dialect)
+register_dialect("unix", UnixDialect)
 
 
 class DictReader:
