@@ -804,11 +804,6 @@ class _Environ(MutableMapping):
     def copy(self):
         return dict(self)
 
-    def setdefault(self, key, value):
-        if key not in self:
-            self[key] = value
-        return self[key]
-
 
 try:
     _putenv = putenv
@@ -949,7 +944,6 @@ if _is_globals_has("fork") and not _is_globals_has("spawnv") and _is_globals_has
 
     __all__.extend(["P_WAIT", "P_NOWAIT", "P_NOWAITO"])
 
-
     # XXX Should we support P_DETACH?  I suppose it could fork()**2
     # and close the std I/O streams.  Also, P_OVERLAY is the same
     # as execv*()?
@@ -985,10 +979,11 @@ if _is_globals_has("fork") and not _is_globals_has("spawnv") and _is_globals_has
     def spawnv(mode, file, args):
         """spawnv(mode, file, args) -> integer
 
-Execute file with arguments from args in a subprocess.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file with arguments from args in a subprocess.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         return _spawnvef(mode, file, args, None, execv)
 
 
