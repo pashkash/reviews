@@ -55,16 +55,12 @@ if 'posix' in _names:
 
     try:
         from posix import _exit
-
         __all__.append('_exit')
-    except ImportError:
-        pass
-    import posixpath as path
 
-    try:
         from posix import _have_functions
     except ImportError:
         pass
+    import posixpath as path
 
     import posix
 
@@ -78,8 +74,9 @@ elif 'nt' in _names:
 
     try:
         from nt import _exit
-
         __all__.append('_exit')
+
+        from nt import _have_functions
     except ImportError:
         pass
     import ntpath as path
@@ -88,11 +85,6 @@ elif 'nt' in _names:
     __all__.extend(_get_module_attributes_list(nt))
     del nt
 
-    try:
-        from nt import _have_functions
-    except ImportError:
-        pass
-
 elif 'ce' in _names:
     name = 'ce'
     linesep = '\r\n'
@@ -100,8 +92,9 @@ elif 'ce' in _names:
 
     try:
         from ce import _exit
-
         __all__.append('_exit')
+
+        from ce import _have_functions
     except ImportError:
         pass
     # We can use the standard Windows path.
@@ -110,11 +103,6 @@ elif 'ce' in _names:
 
     __all__.extend(_get_module_attributes_list(ce))
     del ce
-
-    try:
-        from ce import _have_functions
-    except ImportError:
-        pass
 
 else:
     raise ImportError('no os specific module found')
