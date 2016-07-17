@@ -23,8 +23,9 @@ and opendir), and leave all pathname manipulation to os.path
 
 #'
 import abc
-import sys, errno
+import errno
 import stat as st
+import sys
 
 _names = sys.builtin_module_names
 
@@ -110,8 +111,7 @@ else:
     raise ImportError('no os specific module found')
 
 sys.modules['os.path'] = path
-from os.path import (curdir, pardir, sep, pathsep, defpath, extsep, altsep,
-    devnull)
+from os.path import (curdir, pathsep, defpath)
 
 del _names
 
