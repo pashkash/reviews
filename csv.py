@@ -3,13 +3,14 @@ csv.py - read/write/investigate CSV files
 """
 
 import re
-from _csv import Error, __version__, writer, reader, register_dialect, \
-    unregister_dialect, get_dialect, list_dialects, \
-    field_size_limit, \
-    QUOTE_MINIMAL, QUOTE_ALL, QUOTE_NONNUMERIC, QUOTE_NONE, \
-    __doc__
-from _csv import Dialect as _Dialect
+
 from io import StringIO
+from _csv import (Error, __version__, writer, reader, register_dialect,
+                  unregister_dialect, get_dialect, list_dialects,
+                  field_size_limit,
+                  QUOTE_MINIMAL, QUOTE_ALL, QUOTE_NONNUMERIC, QUOTE_NONE,
+                  __doc__)
+from _csv import Dialect as _Dialect
 
 __all__ = ["QUOTE_MINIMAL", "QUOTE_ALL", "QUOTE_NONNUMERIC", "QUOTE_NONE",
            "Error", "Dialect", "__doc__", "excel", "excel_tab",
@@ -154,8 +155,8 @@ class DictWriter:
         if self.extrasaction == "raise":
             wrong_fields = [k for k in rowdict if k not in self.fieldnames]
             if wrong_fields:
-                raise ValueError("dict contains fields not in fieldnames: "
-                                 + ", ".join([repr(x) for x in wrong_fields]))
+                raise ValueError("dict contains fields not in fieldnames: " +
+                                 ", ".join([repr(x) for x in wrong_fields]))
         return (rowdict.get(key, self.restval) for key in self.fieldnames)
 
     def writerow(self, rowdict):
@@ -173,10 +174,9 @@ except NameError:
 
 
 class Sniffer:
-    '''
-    "Sniffs" the format of a CSV file (i.e. delimiter, quotechar)
+    """Sniffs the format of a CSV file (i.e. delimiter, quotechar)
     Returns a Dialect object.
-    '''
+    """
 
     def __init__(self):
         # in case there is more than one possible delimiter
