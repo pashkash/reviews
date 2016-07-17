@@ -417,7 +417,7 @@ class Sniffer:
             if len(row) != columns:
                 continue  # skip rows that have irregular number of columns
 
-            for col in list(column_types_dict.keys()):
+            for col in list(column_types_dict):
 
                 for thisType in [int, float, complex]:
                     try:
