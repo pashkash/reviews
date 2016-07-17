@@ -35,11 +35,11 @@ __all__ = ["altsep", "curdir", "pardir", "sep", "pathsep", "linesep",
            "popen", "extsep"]
 
 
-def _exists(name):
+def _is_globals_has(name):
     return name in globals()
 
 
-def _get_exports_list(module):
+def _get_module_attributes_list(module):
     try:
         return list(module.__all__)
     except AttributeError:
@@ -68,7 +68,7 @@ if 'posix' in _names:
 
     import posix
 
-    __all__.extend(_get_exports_list(posix))
+    __all__.extend(_get_module_attributes_list(posix))
     del posix
 
 elif 'nt' in _names:
@@ -85,7 +85,7 @@ elif 'nt' in _names:
     import ntpath as path
     import nt
 
-    __all__.extend(_get_exports_list(nt))
+    __all__.extend(_get_module_attributes_list(nt))
     del nt
 
     try:
@@ -108,7 +108,7 @@ elif 'ce' in _names:
     import ntpath as path
     import ce
 
-    __all__.extend(_get_exports_list(ce))
+    __all__.extend(_get_module_attributes_list(ce))
     del ce
 
     try:
@@ -124,7 +124,7 @@ from os.path import (curdir, pathsep, defpath)
 
 del _names
 
-if _exists("_have_functions"):
+if _is_globals_has("_have_functions"):
     _globals = globals()
 
     def _add(str, fn):
@@ -166,7 +166,7 @@ if _exists("_have_functions"):
     _add("HAVE_FUTIMENS", "utime")
     _add("HAVE_FUTIMES", "utime")
     _add("HAVE_FPATHCONF", "pathconf")
-    if _exists("statvfs") and _exists("fstatvfs"):  # mac os x10.3
+    if _is_globals_has("statvfs") and _is_globals_has("fstatvfs"):  # mac os x10.3
         _add("HAVE_FSTATVFS", "statvfs")
     supports_fd = _set
 
@@ -197,7 +197,7 @@ if _exists("_have_functions"):
     _add("HAVE_FSTATAT", "stat")
     _add("HAVE_LCHFLAGS", "chflags")
     _add("HAVE_LCHMOD", "chmod")
-    if _exists("lchown"):  # mac os x10.3
+    if _is_globals_has("lchown"):  # mac os x10.3
         _add("HAVE_LCHOWN", "chown")
     _add("HAVE_LINKAT", "link")
     _add("HAVE_LUTIMES", "utime")
@@ -953,7 +953,7 @@ fsencode, fsdecode = _fscodec()
 del _fscodec
 
 # Supply spawn*() (probably only for Unix)
-if _exists("fork") and not _exists("spawnv") and _exists("execv"):
+if _is_globals_has("fork") and not _is_globals_has("spawnv") and _is_globals_has("execv"):
 
     P_WAIT = 0
     P_NOWAIT = P_NOWAITO = 1
@@ -1040,7 +1040,7 @@ otherwise return -SIG, where SIG is the signal that killed it. """
 
     __all__.extend(["spawnv", "spawnve", "spawnvp", "spawnvpe"])
 
-if _exists("spawnv"):
+if _is_globals_has("spawnv"):
     # These aren't supplied by the basic Windows code
     # but can be easily implemented in Python
 
@@ -1068,7 +1068,7 @@ otherwise return -SIG, where SIG is the signal that killed it. """
 
     __all__.extend(["spawnl", "spawnle"])
 
-if _exists("spawnvp"):
+if _is_globals_has("spawnvp"):
     # At the moment, Windows doesn't implement spawnvp[e],
     # so it won't have spawnlp[e] either.
     def spawnlp(mode, file, *args):
@@ -1191,7 +1191,7 @@ def _fspath(path):
 
 # If there is no C implementation, make the pure Python version the
 # implementation as transparently as possible.
-if not _exists('fspath'):
+if not _is_globals_has('fspath'):
     fspath = _fspath
     fspath.__name__ = "fspath"
 
