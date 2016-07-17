@@ -994,11 +994,12 @@ otherwise return -SIG, where SIG is the signal that killed it. """
     def spawnve(mode, file, args, env):
         """spawnve(mode, file, args, env) -> integer
 
-Execute file with arguments from args in a subprocess with the
-specified environment.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file with arguments from args in a subprocess with the
+        specified environment.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         return _spawnvef(mode, file, args, env, execve)
 
 
@@ -1007,22 +1008,24 @@ otherwise return -SIG, where SIG is the signal that killed it. """
     def spawnvp(mode, file, args):
         """spawnvp(mode, file, args) -> integer
 
-Execute file (which is looked for along $PATH) with arguments from
-args in a subprocess.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file (which is looked for along $PATH) with arguments from
+        args in a subprocess.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         return _spawnvef(mode, file, args, None, execvp)
 
 
     def spawnvpe(mode, file, args, env):
         """spawnvpe(mode, file, args, env) -> integer
 
-Execute file (which is looked for along $PATH) with arguments from
-args in a subprocess with the supplied environment.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file (which is looked for along $PATH) with arguments from
+        args in a subprocess with the supplied environment.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         return _spawnvef(mode, file, args, env, execvpe)
 
 
@@ -1035,21 +1038,23 @@ if _is_globals_has("spawnv"):
     def spawnl(mode, file, *args):
         """spawnl(mode, file, *args) -> integer
 
-Execute file with arguments from args in a subprocess.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file with arguments from args in a subprocess.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         return spawnv(mode, file, args)
 
 
     def spawnle(mode, file, *args):
         """spawnle(mode, file, *args, env) -> integer
 
-Execute file with arguments from args in a subprocess with the
-supplied environment.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file with arguments from args in a subprocess with the
+        supplied environment.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         env = args[-1]
         return spawnve(mode, file, args[:-1], env)
 
@@ -1062,22 +1067,24 @@ if _is_globals_has("spawnvp"):
     def spawnlp(mode, file, *args):
         """spawnlp(mode, file, *args) -> integer
 
-Execute file (which is looked for along $PATH) with arguments from
-args in a subprocess with the supplied environment.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file (which is looked for along $PATH) with arguments from
+        args in a subprocess with the supplied environment.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         return spawnvp(mode, file, args)
 
 
     def spawnlpe(mode, file, *args):
         """spawnlpe(mode, file, *args, env) -> integer
 
-Execute file (which is looked for along $PATH) with arguments from
-args in a subprocess with the supplied environment.
-If mode == P_NOWAIT return the pid of the process.
-If mode == P_WAIT return the process's exit code if it exits normally;
-otherwise return -SIG, where SIG is the signal that killed it. """
+        Execute file (which is looked for along $PATH) with arguments from
+        args in a subprocess with the supplied environment.
+        If mode == P_NOWAIT return the pid of the process.
+        If mode == P_WAIT return the process's exit code if it exits normally;
+        otherwise return -SIG, where SIG is the signal that killed it.
+        """
         env = args[-1]
         return spawnvpe(mode, file, args[:-1], env)
 
