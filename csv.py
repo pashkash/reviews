@@ -122,7 +122,7 @@ class DictReader:
         # unlike the basic reader, we prefer not to return blanks,
         # because we will typically wind up with a dict full of None
         # values
-        while row == []:
+        while not row:
             row = next(self.reader)
         d = dict(zip(self.fieldnames, row))
         lf = len(self.fieldnames)
