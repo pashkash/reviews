@@ -3,7 +3,6 @@ csv.py - read/write/investigate CSV files
 """
 
 import re
-
 from io import StringIO
 from _csv import (Error, __version__, writer, reader, register_dialect,
                   unregister_dialect, get_dialect, list_dialects,
@@ -208,7 +207,7 @@ class Sniffer:
 
         return dialect
 
-    def _guess_quote_and_delimiter(self, data, delimiters):
+    def _guess_quote_and_delimiter(self, sample, delimiters):
         """
         Looks for text enclosed between two identical quotes
         (the probable quotechar) which are preceded and followed
@@ -230,7 +229,7 @@ class Sniffer:
                 # ,".*?"
                 '(?:^|\n)(?P<quote>["\']).*?(?P=quote)(?:$|\n)'):  # ".*?" (no delim, no space)
             regexp = re.compile(restr, re.DOTALL | re.MULTILINE)
-            matches = regexp.findall(data)
+            matches = regexp.findall(sample)
             if matches:
                 break
 
@@ -279,14 +278,14 @@ class Sniffer:
             r"[^%(delim)s\n]*%(quote)s\W*((%(delim)s)|$)" % {
                 'delim': re.escape(delim), 'quote': quotechar}, re.MULTILINE)
 
-        if dq_regexp.search(data):
+        if dq_regexp.search(sample):
             doublequote = True
         else:
             doublequote = False
 
         return (quotechar, doublequote, delim, skipinitialspace)
 
-    def _guess_delimiter(self, data, delimiters):
+    def _guess_delimiter(self, sample, delimiters):
         """
         The delimiter /should/ occur the same number of times on
         each row. However, due to malformed data, it may not. We don't want
@@ -305,20 +304,20 @@ class Sniffer:
         additional chunks as necessary.
         """
 
-        data = list(filter(None, data.split('\n')))
+        sample = list(filter(None, sample.split('\n')))
 
         ascii = [chr(c) for c in range(127)]  # 7-bit ASCII
 
         # build frequency tables
-        chunkLength = min(10, len(data))
+        chunkLength = min(10, len(sample))
         iteration = 0
         charFrequency = {}
         modes = {}
         delims = {}
-        start, end = 0, min(chunkLength, len(data))
-        while start < len(data):
+        start, end = 0, min(chunkLength, len(sample))
+        while start < len(sample):
             iteration += 1
-            for line in data[start:end]:
+            for line in sample[start:end]:
                 for char in ascii:
                     metaFrequency = charFrequency.get(char, {})
                     # must count even if frequency is 0
@@ -359,8 +358,8 @@ class Sniffer:
 
             if len(delims) == 1:
                 delim = list(delims.keys())[0]
-                skipinitialspace = (data[0].count(delim) ==
-                                    data[0].count("%c " % delim))
+                skipinitialspace = (sample[0].count(delim) ==
+                                    sample[0].count("%c " % delim))
                 return (delim, skipinitialspace)
 
             # analyze another chunkLength lines
@@ -374,8 +373,8 @@ class Sniffer:
         if len(delims) > 1:
             for d in self.preferred:
                 if d in delims.keys():
-                    skipinitialspace = (data[0].count(d) ==
-                                        data[0].count("%c " % d))
+                    skipinitialspace = (sample[0].count(d) ==
+                                        sample[0].count("%c " % d))
                     return (d, skipinitialspace)
 
         # nothing else indicates a preference, pick the character that
@@ -384,11 +383,11 @@ class Sniffer:
         items.sort()
         delim = items[-1][1]
 
-        skipinitialspace = (data[0].count(delim) ==
-                            data[0].count("%c " % delim))
+        skipinitialspace = (sample[0].count(delim) ==
+                            sample[0].count("%c " % delim))
         return (delim, skipinitialspace)
 
-    def has_header(self, sample):
+    def has_header(self, file_data):
         """Creates a dictionary of types of data in each column. If any
         column is of a single type (say, integers), *except* for the first
         row, then the first row is presumed to be labels. If the type
@@ -397,61 +396,67 @@ class Sniffer:
         rows except for the first are the same length, it's a header.
         Finally, a 'vote' is taken at the end for each column, adding or
         subtracting from the likelihood of the first row being a header.
+
+        :param file_data: sample csv file data
         """
 
-        rdr = reader(StringIO(sample), self.sniff(sample))
-        header = next(rdr)  # assume first row is header
+        reader_instance = reader(StringIO(file_data), self.sniff(file_data))
+        header = next(reader_instance)  # rows starts with the header
+        columns_num = len(header)
+        column_types_dict = dict.fromkeys(range(0, columns_num), None)
 
-        columns = len(header)
-        column_types_dict = {}
-        for i in range(columns):
-            column_types_dict[i] = None
-
-        checked = 0
-        for row in rdr:
-            # arbitrary number of rows to check, to keep it sane
-            if checked > 20:
-                break
-            checked += 1
-
-            if len(row) != columns:
+        for row in reader_instance[:20]:
+            if len(row) != columns_num:
                 continue  # skip rows that have irregular number of columns
 
-            for col in list(column_types_dict):
-
-                for thisType in [int, float, complex]:
+            for col in column_types_dict:
+                for try_type in [int, float, complex]:
                     try:
-                        thisType(row[col])
+                        try_type(row[col])
                         break
                     except (ValueError, OverflowError):
                         pass
                 else:
                     # fallback to length of string
-                    thisType = len(row[col])
+                    try_type = len(row[col])
 
-                if thisType != column_types_dict[col]:
+                if try_type != column_types_dict[col]:
                     if column_types_dict[col] is None:  # add new column type
-                        column_types_dict[col] = thisType
+                        column_types_dict[col] = try_type
                     else:
                         # type is inconsistent, remove column from
                         # consideration
                         del column_types_dict[col]
 
-        # finally, compare results against first row and "vote"
-        # on whether it's a header
-        has_header = 0
-        for col, colType in column_types_dict.items():
-            if type(colType) == type(0):  # it's a length
-                if len(header[col]) != colType:
-                    has_header += 1
+        # Get results against first row and "vote" on whether it's a header.
+        votes = self._count_header_votes(header, column_types_dict)
+
+        # our assume about header exist is
+        return votes > 0
+
+    @staticmethod
+    def _count_header_votes(header, column_types_dict):
+        """Calculate difference between first row and dictionary of columns
+        in csv file
+
+        :param header: first row of csv_file
+        :param column_types_dict: dictionary of columns in csv file
+        :return: votes
+        """
+
+        votes = 0
+        for col, col_type in column_types_dict.items():
+            if isinstance(type(col_type), int):  # it's a length
+                if len(header[col]) != col_type:
+                    votes += 1
                 else:
-                    has_header -= 1
+                    votes -= 1
             else:  # attempt typecast
                 try:
-                    colType(header[col])
+                    col_type(header[col])
                 except (ValueError, TypeError):
-                    has_header += 1
+                    votes += 1
                 else:
-                    has_header -= 1
+                    votes -= 1
 
-        return has_header > 0
+        return votes
